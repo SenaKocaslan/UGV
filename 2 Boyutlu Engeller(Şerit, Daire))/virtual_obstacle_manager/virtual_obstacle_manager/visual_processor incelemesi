@@ -1,0 +1,180 @@
+belirlenen noktalara göre perpektif değişimi yapılmıyor mu? Henüz dönüşümü yapılacak noktalar belirlenmemişken nasıl dönüşüm yapılabilir?
+
+ _, thresh_fixed = cv2.threshold(blur, 160, 255, cv2.THRESH_BINARY)
+        mask = cv2.bitwise_and(thresh_fixed, thresh_adapt) 
+hem sabit hem değişken eşik değeri  ile maske oluşturuluyor.
+
+(bu kadar esnek ve duruma uyum sağlayan bir kod nasıl başarsız olabiliyor?)
+
+
+alanı, çevresi,daireselliği, en-boy oranı, elipslik skoru hesaplanıyor
+elipslik skoru, dairsellik, alan ile oluşturulan son skor kameranın aldığı görüntülerdeki daireleri elipsleri bulmada neden başarısız?  
+
+	alan değeri 
+		1.0 ise daire
+		0.9-0.5 ise elips
+		0.5-0.2 ise şerit, uzun ince bir şey
+		
+	sınırları varmış. Kodda alan 0.35 in altında ise şekil tespit edilmiyor.
+	Şerit tespiti için bu eşiğin düşürülmesi gerek.(şeritin kalınlığına göre eşik değeri ile oynanmalı, bunun için ortalama değer deneme yanılma ile bulunabilr sanırım.)
+
+
+* en boy oranınn 1.0 a yakın olması şeklin kare veya daire gibi bir şey olduğunun gösterir. Birden farklı değerler şekiln basıl ya da ince uzun bir şey oldğunu ifade eder
+
+
+*kernel boyutunun büyütülmesi resmi daha çok bulanıklaştırır
+
+ + kodun ilk halinde cahin_approx_simple kullanılmış(şeklin belirli kısımları hafızada tutuluyor) bu chain_approx_noe a çevrilerek tüm noktalrın hafızada tutulması sağlanabilir
+
+ + yol kenraındaki şeritlerinin dış kontürlerinin çizilmesinde RETR_CCOMP, RETR_LIST, RETR_TREE kullanılabilir. Mevcut kontür bulma fonksiyonunun argümanı(retr_external) değiştirlerek. hiyerarşi ne işe yarayabilir bilmiyorum ama.
+
++ şeritlerin tespitinde en boy oranı şeritler için 1 den küçük olmalı.
+
+? şeritlerin tespiti için ayrı, dairlerin tespiti için ayrı metodlar lazım
+
+? aracın sağa mı sola mı kaydığının bilgis gerekli midir? bu bilgiyle aracın motorlarına sola gidildiyse sağa git, sola gidildiyse sağa git komutu veriliyormuş.
+
+
+? çizgi tespitinde görüntüler bgr den hsl ye çevrildiğinden beyaz şeritler fazla parlak olmadığından mı tespit edilemiyor acaba? 
+
+? Tuzak tespitinde görüntüyü bgr den griye dönüşütürülüyor 
+
+? Şerit tespitinde görüntünün ilk yüzde 60 lık kısmı kullanılıyor sonraki 40 lık kısmına siyah maske uygulanıyormuş , kamera eğik olduğu için yolun ileri kısmlarından gelen bilgi güvenilmez olduğu için o kısımlar maskeleniyormuş
+
+
+
+
+02/05/2026
+hls ayarları ile beyaz görüntüler hiç tespit edilmiyor, maskelenmiş parlak yerler maskeler sayesinde beyaz olarak görünüyor ve bu sınırları çizerek engeli oluşturuyor.
+
+Tuzak tespiti için yeni yaklaşım hough  daire tespiti
+Öncesi :
+"""
+    # -----------------------------------------------------------------------
+    def _detect_trap(self, frame):
+        
+        Dönüş: (detected: bool, trap_x: int, trap_y: int, contour)
+        trap_y eklendi → derinlik haritasında y koordinatı da gerekli
+        
+
+        #kontürleri bulma yöntemi, puanlama yöntemi değiştirilebilir
+
+        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        cv2.imshow("tuzak içn girye çevrilmiş",gray)
+        blur = cv2.GaussianBlur(gray, (9, 9), 0)
+        cv2.imshow("tuzak içn blurlanmış",blur)
+
+        thresh_adapt = cv2.adaptiveThreshold(
+            blur, 255,
+            cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
+            cv2.THRESH_BINARY, 25, -8    #25x25 lik komşuluk ayarı
+        )
+        _, thresh_fixed = cv2.threshold(blur, 160, 255, cv2.THRESH_BINARY)
+        mask = cv2.bitwise_and(thresh_fixed, thresh_adapt)    
+
+        k_close = np.ones((11, 11), np.uint8)
+        k_open  = np.ones((5,  5),  np.uint8)
+        mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, k_close)
+
+        cv2.imshow("tuzak maksesi 1",mask)
+
+        mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN,  k_open)
+
+        cv2.imshow("tuzak maskesi 2",mask)
+
+
+        contours, _ = cv2.findContours(
+            mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        
+
+      
+
+        best_trap  = None
+        best_score = 0
+        trap_x     = self.img_width  // 2
+        trap_y     = self.img_height // 2   # ← YENİ: y merkezi
+
+        for cnt in contours:
+            area = cv2.contourArea(cnt)
+            if area < self.trap_min_area or area > self.trap_max_area:
+                continue
+
+            perimeter = cv2.arcLength(cnt, True)
+            if perimeter < 1:  #
+                continue
+
+            circularity = (4 * np.pi * area) / (perimeter ** 2)
+            if circularity < self.min_circularity:
+                continue
+
+            x, y, w, h = cv2.boundingRect(cnt)
+            aspect = float(max(w, h)) / max(min(w, h), 1)
+            if aspect > self.max_aspect:
+                continue
+
+            ellipse_score = 0.0
+            if len(cnt) >= 5:
+                try:
+                    ellipse   = cv2.fitEllipse(cnt)
+                    ew, eh    = ellipse[1]
+                    ellipse_area = np.pi * (ew / 2) * (eh / 2)
+                    if ellipse_area > 0:
+                        ellipse_score = min(area, ellipse_area) / max(area, ellipse_area)
+                except Exception:
+                    pass
+
+            combined_score = circularity * 0.5 + ellipse_score * 0.5
+            if combined_score < 0.30:
+                continue
+
+            final_score = area * combined_score
+            if final_score > best_score:
+                best_score = final_score
+                best_trap  = cnt
+                M = cv2.moments(cnt)
+                if M["m00"] != 0:     # resimdeki beyaz piksellerin bu işlemden yalnızca beyaz daire olmasını bekliyoruz ve m00 momenti resimdeki bu beyaz piksellerin toplam sayısını yani tuzağın toplam alanını verir
+                    trap_x = int(M["m10"] / M["m00"])   # x eksenindeki ilk momentin toplam beyaz piksel sayısına bölünmesi ile tuzağın x eksenindeki merkezi bulunur
+                    trap_y = int(M["m01"] / M["m00"])   # ← YENİ    Y ekseninde ilk momentin toplam beyaz piksel sayısına bölünmesi tuzağın y eksenindeki merkezi bulunur
+                                                        # kısacaası toplam ağırlık toplam alana bölünerek ağırlık merkezi bulunuyor
+
+        return (best_trap is not None), trap_x, trap_y, best_trap
+"""
+
+Sonrası :
+"""def _detect_trap(self, frame):
+    """
+    Hough daire tespiti ile beyaz daire bulur.
+    Dönüş: (detected: bool, trap_x: int, trap_y: int, contour)
+    """
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    blur = cv2.GaussianBlur(gray, (9, 9), 2)
+
+    # Sadece parlak beyaz piksellere bak
+    _, white_mask = cv2.threshold(blur, 160, 255, cv2.THRESH_BINARY)
+    blur_masked = cv2.bitwise_and(blur, white_mask)
+
+    circles = cv2.HoughCircles(
+        blur_masked,
+        cv2.HOUGH_GRADIENT,
+        dp=1.2,
+        minDist=50,
+        param1=100,
+        param2=30,
+        minRadius=20,
+        maxRadius=150
+    )
+
+    if circles is not None:
+        circles = np.round(circles[0, :]).astype("int")
+        # En büyük daireyi al
+        best = max(circles, key=lambda c: c[2])  # c[2] = yarıçap
+        cx, cy, r = best
+
+        # Debug için sahte kontur oluştur (çizim için)
+        fake_cnt = cv2.ellipse2Poly(
+            (cx, cy), (r, r), 0, 0, 360, 10)
+        fake_cnt = fake_cnt.reshape(-1, 1, 2)
+
+        return True, int(cx), int(cy), fake_cnt
+
+    return False, self.img_width // 2, self.img_height // 2, None"""
