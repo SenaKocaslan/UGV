@@ -1,0 +1,30 @@
+# Tam sistem (ZED + Arduino + GUI)
+python birlesik_apf.py
+
+# Arduino olmadan test
+python birlesik_apf.py --no-serial
+
+# SSH / ekransız
+python birlesik_apf.py --no-gui
+
+# Tarayıcıdan izle
+python birlesik_apf.py --stream
+# Tarayıcıya yaz: http://localhost:8080
+# Başka cihazdan: http://<jetson-ip>:8080
+# IP öğrenmek için: hostname -I
+
+# Stream + Arduino yok
+python birlesik_apf.py --no-serial --stream
+
+# Stream portu değiştir
+python birlesik_apf.py --stream --stream-port 9090
+# Tarayıcıya yaz: http://localhost:9090
+
+# Farklı model dosyası
+python birlesik_apf.py --weights best2.pt
+
+# YOLO güven eşiği yükselt
+python birlesik_apf.py --conf 0.4
+
+# Tam kombine: stream + serial yok + farklı model
+python birlesik_apf.py --no-serial --stream --weights best2.pt --conf 0.3
