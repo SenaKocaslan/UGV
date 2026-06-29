@@ -1,0 +1,17 @@
+kur: pip install opencv-python numpy ultralytics insightface onnxruntime pyserial --break-system-packages
+
+
+
+fotoğramı ekleyip tanımlatma ve augmentation işlemi yapmak için: python3 yaris_v10_3_temiz (2)(en_iyisi).py --hedef-ekle "2026-06-28-170435.jpg" --isim TALHA
+
+
+
+eğer yanlış fotoğraf eklediysen silmek için: python3 yaris_v10_3_temiz (2)(en_iyisi).py --hedef-sil TALHA
+
+
+
+fotoğraf listesi: python3 yaris_v10_3_temiz (2)(en_iyisi).py --hedef-listesi
+
+
+
+kamerayı tak, dosyaya git ve başlat: python3 yaris_v10_3_temiz (2)(en_iyisi).py
