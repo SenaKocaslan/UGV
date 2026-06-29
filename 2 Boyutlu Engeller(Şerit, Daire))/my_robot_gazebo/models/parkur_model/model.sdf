@@ -1,0 +1,179 @@
+<?xml version="1.0"?>
+<sdf version="1.6">
+  <model name="parkur">
+    <static>true</static>
+    
+    <link name="bariyer">
+      <visual name="visual_bariyer">
+        <geometry>
+          <mesh>
+            <uri>model://parkur_model/meshes/bariyer.dae</uri>
+	    <scale>1 1 1</scale>
+          </mesh>
+        </geometry>
+      </visual>
+      <collision name="collision_bariyer">
+        <geometry>
+          <mesh>
+            <uri>model://parkur_model/meshes/bariyer.dae</uri>
+          </mesh>
+        </geometry>
+      </collision>
+    </link>
+        <link name="cizgiler">
+      <visual name="visual_cizgiler">
+        <geometry>
+          <mesh>
+            <uri>model://parkur_model/meshes/cizgiler.dae</uri>
+            <scale>1 1 1</scale>
+          </mesh>
+        </geometry>
+      </visual>
+      <collision name="collision_cizgiler">
+        <geometry>
+          <mesh>
+            <uri>model://parkur_model/meshes/cizgiler.dae</uri>
+          </mesh>
+        </geometry>
+      </collision>
+    </link>
+        <link name="dik_egim">
+      <visual name="visual_dik_egim">
+        <geometry>
+          <mesh>
+            <uri>model://parkur_model/meshes/dik_egim.dae</uri>
+            <scale>1 1 1</scale>
+          </mesh>
+        </geometry>
+      </visual>
+      <collision name="collision_dik_egim">
+        <geometry>
+          <mesh>
+            <uri>model://parkur_model/meshes/dik_egim.dae</uri>
+          </mesh>
+        </geometry>
+      </collision>
+    </link>
+    <link name="kukalar">
+      <visual name="visual_kukalar">
+        <geometry>
+          <mesh>
+            <uri>model://parkur_model/meshes/kukalar.dae</uri>
+            <scale>1 1 1</scale>
+          </mesh>
+        </geometry>
+      </visual>
+      <collision name="collision_kukalar">
+        <geometry>
+          <mesh>
+            <uri>model://parkur_model/meshes/kukalar.dae</uri>
+          </mesh>
+        </geometry>
+      </collision>
+    </link>
+    <link name="sudan_gecis">
+      <visual name="visual_sudan_gecis">
+        <geometry>
+          <mesh>
+            <uri>model://parkur_model/meshes/sudan_gecis.dae</uri>
+            <scale>1 1 1</scale>
+          </mesh>
+        </geometry>
+      </visual>
+      <collision name="collision_sudan_gecis">
+        <geometry>
+          <mesh>
+            <uri>model://parkur_model/meshes/sudan_gecis.dae</uri>
+          </mesh>
+        </geometry>
+      </collision>
+    </link>
+    <link name="tabelalar">
+      <visual name="visual_tabelalar">
+        <geometry>
+          <mesh>
+            <uri>model://parkur_model/meshes/tabelalar.dae</uri>
+            <scale>1 1 1</scale>
+          </mesh>
+        </geometry>
+      </visual>
+      <collision name="collision_tabelalar">
+        <geometry>
+          <mesh>
+            <uri>model://parkur_model/meshes/tabelalar.dae</uri>
+          </mesh>
+        </geometry>
+      </collision>
+    </link>
+    <link name="tasli_cakilli_yol">
+      <visual name="visual_tasli_cakilli_yol">
+        <geometry>
+          <mesh>
+            <uri>model://parkur_model/meshes/tasli_cakilli_yol.dae</uri>
+            <scale>1 1 1</scale>
+          </mesh>
+        </geometry>
+      </visual>
+      <collision name="collision_tasli_cakilli_yol">
+        <geometry>
+          <mesh>
+            <uri>model://parkur_model/meshes/tasli_cakilli_yol.dae</uri>
+          </mesh>
+        </geometry>
+      </collision>
+    </link>
+    <link name="yan_egim">
+      <visual name="visual_yan_egim">
+        <geometry>
+          <mesh>
+            <uri>model://parkur_model/meshes/yan_egim.dae</uri>
+            <scale>1 1 1</scale>
+          </mesh>
+        </geometry>
+      </visual>
+      <collision name="collision_yan_egim">
+        <geometry>
+          <mesh>
+            <uri>model://parkur_model/meshes/yan_egim.dae</uri>
+          </mesh>
+        </geometry>
+      </collision>
+    </link>
+    <link name="yol">
+      <visual name="visual_yol">
+        <geometry>
+          <mesh>
+            <uri>model://parkur_model/meshes/yol.dae</uri>
+            <scale>1 1 1</scale>
+          </mesh>
+        </geometry>
+      </visual>
+      <collision name="collision_yol">
+        <geometry>
+          <mesh>
+            <uri>model://parkur_model/meshes/yol.dae</uri>
+          </mesh>
+        </geometry>
+      </collision>
+    </link>
+    <link name="zemin">
+      <visual name="visual_zemin">
+        <geometry>
+          <mesh>
+            <uri>model://parkur_model/meshes/zemin.dae</uri>
+            <scale>1 1 1</scale>
+          </mesh>
+        </geometry>
+      </visual>
+      <collision name="collision_zemin">
+        <geometry>
+          <mesh>
+            <uri>model://parkur_model/meshes/zemin.dae</uri>
+          </mesh>
+        </geometry>
+      </collision>
+    </link>
+    
+    
+  </model>
+</sdf>

@@ -1,0 +1,34 @@
+ROBOTTAN BAĞIMSIZ  TEST İÇİN:
+
+kameranınimu su ile konumlandırma,
+sdk daki spatial mapping modülü / (cartographer veya Rtab map çalışıtırarak 2d-3d doluluk ızgarası çıkarılabilir)
+nav2 ile navigasyon 
+ 
+ 
+ ile yapılacak, 
+
+
+1) Sdk içindeki spatial mapping ile haritalandırma yapılacak:
+	common.yaml daki pos tracking ve mapping kısmlarını şöyle güncelle
+	pos_tracking:
+    pos_tracking_enabled: true
+    publish_tf: true       # odom -> base_link dönüşümünü yayınlar
+    publish_map_tf: true   # map -> odom dönüşümünü yayınlar (Çok kritik)
+
+mapping:
+    mapping_enabled: true  # SLAM'i aktif eder
+    resolution: 0.05       # Harita çözünürlüğü (metre cinsinden, 5 cm Nav2 için idealdir)
+    max_mapping_range: 5.0 # Çok uzak ve gürültülü verileri haritaya almamak için menzili sınırlar
+    
+ 
+ 2) kamerayı haritalama modunda başlat:
+ 	ros2 launch zed_wrapper zed_camera.launch.py camera_model:=zedm
+ 	
+ yolo düğümünü çalıştır.
+  ros2 run yolo_lane_detector lane_detector
+ 	
+3) rvizde aç
+	fixed frame map olacak
+	tf ve pointcloud2 eklenir
+	
+4) 
